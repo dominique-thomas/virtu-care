@@ -9,105 +9,115 @@
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-  <div id="home" class="ui container">
-    <!-- Scenario intro section -->
-    <h2 class="ui header center">Welcome to VirtuCare</h2>
-    <p>VirtuCare is a simulation designed to help healthcare professionals practice patient interviews in a realistic, low-pressure environment.
-        You'll be introduced to one of two virtual patients. The patients, thier symptoms, their and responses may vary per session.
-        <br><br>
-        Before continuing, you'll need to allow microphone access to speak to the patient. Make sure to ask questions and gather information, just like you're in a real-world setting.
-        <br><br>
-        Click the button below to begin your session.</p>
-   <div> <button class="ui gradient-button start-btn" onclick="startInterview()">Start Interview</button>
+
+  <div id="speechWarning" class="warning hidden">
+    <div class="ui negative message center">
+      <div class="header">Speech Recognition Not Supported</div>
+      <p>Your browser does not support speech recognition. Please use a supported browser like Chrome.</p>
+    </div>
+  </div>
+  
+  <div id="main" class="hidden">
+
+      <div id="home" class="ui container">
+        <!-- Scenario intro section -->
+        <h2 class="ui header center">Welcome to VirtuCare</h2>
+        <p>VirtuCare is a simulation designed to help healthcare professionals practice patient interviews in a realistic, low-pressure environment.
+            You'll be introduced to one of two virtual patients. The patients, thier symptoms, their and responses may vary per session.
+            <br><br>
+            Before continuing, you'll need to allow microphone access to speak to the patient. Make sure to ask questions and gather information, just like you're in a real-world setting.
+            <br><br>
+            Click the button below to begin your session.</p>
+      <div> <button class="ui gradient-button start-btn" onclick="startInterview()">Start Interview</button>
+        </div>
+      </div>
+
+
+
+        <div id="interview" class="hidden">
+          <h2 class="ui header center">Patient Interview</h2>        
+          <div class="ui container segment">            
+            <div class="ui secondary menu patient-header-bar container">
+                <div class="item">
+                    <span class="patientHeader">Patient Name: </span><span id="patientName">Tracy</span>
+                </div>
+                <div class="right menu">
+                  <div class="item">
+                    <i class="question circle icon link" onclick="showAbout()"></i>
+                  </div>
+                </div>
+              </div>
+              
+
+            <div class="video-container">
+              <div class="overlay"></div>
+                <video id="patientVideo" width="100%" muted autoplay loop>
+                  <source id="video-source" type="video/mp4" src="videos/randy_angry.mp4">
+                  Your browser does not support the video tag.
+                </video>
+
+                <button id="videoToggle" class="ui icon button play-pause-btn">
+                  <i class="pause icon"></i>
+                </button>
+
+                <button id="askBtn" class="ui gradient-button ask-button" onclick="askPatient()">
+                    <i class="microphone icon"></i>
+                    Ask Patient
+                  </button>        
+              </div>
+
+            <div id="chatArea" class="ui chatArea" style="max-height: 250px; overflow-y: auto;">
+              <h4>Chat Log</h4>
+              <div class="chatPrompt">You haven't asked the patient anything yet.<br>Click the <span class="emphasis"> Ask Patient </span> button to start the conversation.</div>
+
+              <div class="chat-log">
+                <!-- Chat Log -->
+              </div> 
+            </div>
+      
+          <div id="controlButtons">
+              <button class="ui controls gradient-button" id="finishBtn" onclick="showFinish()">Finish Interview</button>
+              <button class="ui button controls" id="hintBtn" onclick="showHint()">Hint</button>
+          </div>
+        </div>
+
     </div>
   </div>
 
+  
+  <div id="summary" class="ui container hidden">
+    <h2 class="ui header center">Interview Summary</h2>
+     <p>Here's a summary of your conversation with the patient:</p>
+
+      <h3>What You Discussed</h3>
+      <ul id="covered-list"></ul>
+
+      <h3>What You Didn't Discuss</h3>
+      <ul id="missed-list"></ul>
+    <button class="ui button" onclick="reset()">Reset Simulation</button>
+  </div>
 
 
-  <div id="interview" class="ui container segment">
-    <div class="ui secondary menu patient-header-bar container">
-        <div class="item">
-            <span class="patientHeader">Patient Name: </span><span id="patientName">Tracy</span>
-        </div>
-        <div class="right menu">
-          <div class="item">
-            <i class="question circle icon link" onclick="showAbout()"></i>
-          </div>
-        </div>
-      </div>
-      
-
-    <div class="video-container">
-        <video id="patientVideo" width="100%" poster="images/tracy_placeholder.png" muted autoplay loop>
-          <source src="videos/tracy_neutral.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <button id="videoToggle" class="ui icon button play-pause-btn">
-          <i class="pause icon"></i>
-        </button>
-
-        <button id="askBtn" class="ui button ask-button" onclick="askPatient()">
-            <i class="microphone icon"></i>
-            Ask Patient
-          </button>        
-      </div>
-
-    <div id="chatArea" class="ui chatArea" style="max-height: 250px; overflow-y: auto;">
-      <!-- Conversation logs appear here -->
-       <div class="chatPrompt">You haven't asked the patient anything yet. Click the <span class="emphasis">Ask Patient</span> button to start the conversation.</div>
-
-       <div class="chat-log">
-       <!-- 
-        <div class="message-wrapper patient">
-          <div class="message patient">Hi there, how can I help you today?</div>          
-        </div>
-       
-        <div class="message-wrapper user">            
-          <div class="message user"> <strong>Tracy</strong><br>I'm just not feeling well lately.</div>
-        </div>
-        <div class="message-wrapper patient">
-            <div class="message patient">I'm sorry to hear that...</div>
-          </div>
-          -->
-      </div>      
-    </div>
-
-
-  <!-- Microphone listening -->
+  <!-- Modals --> 
+   
   <div class="ui small modal mic-modal" id="micModal">
     <div class="header">
       <i class="microphone icon pulse-icon"></i>
       Listening...
     </div>
     <div class="content">
-      Please ask the patient a question.<br>
-      For best results, ask <em>one question at a time</em>.
-      <p>This modal will stop listening after 60 seconds or when you click the button below.
-      <p><span id="timer" class="timer">60s</span> remaining</p>
-        
+     For best results, ask one question at a time.<br>
+      This modal will stop listening after <span id="timer" class="timer">60s</span> seconds or when you click the <span>Stop Listening</span>button below.
+       <br> <br> 
+      <p>You said:</p>
+      <div id="liveTranscript" class="stylized"></div>
     </div>
     <div class="actions">
       <button class="ui red button" onclick="stopListening()">Stop Listening</button>
     </div>
   </div>
   
-   
-
-    <div id="controlButtons">
-        <button class="ui controls gradient-button" id="finishBtn" onclick="showFinish()">Finish Interview</button>
-        <button class="ui button controls" id="hintBtn" onclick="showHint()">Hint</button>
-    </div>
-  </div>
-
-  <div id="summary" class="ui container hidden">
-    <h3 class="ui header">Interview Summary</h3>
-    <p>Here's a summary of your conversation with the patient.</p>
-    <div id="summaryContent"></div>
-    <button class="ui button" onclick="goHome()">Reset Simulation</button>
-  </div>
-
-  <!-- Modals -->
-  <div class="ui modal" id="finishModal">
+  <div class="ui small modal" id="finishModal">
     <div class="header">
       Finish Interview
       <i class="close icon" onclick="closeModal()"></i>
@@ -121,17 +131,16 @@
     </div> 
   </div>
 
-  <div class="ui modal" id="hintModal">
-    <div class="header">
-      Hint (1 of 3)
-      <i class="close icon" onclick="closeModal()"></i>
+  <div class="ui small modal" id="hintModal">
+    <div class="hint header">
+      Hint (1 of 3)      
     </div>
     <div class="content">
-      <p id="hintContent">Try asking about lifestyle, symptoms, or family history.</p>
+      <span id="hintText" class="hintText">Try asking about lifestyle, symptoms, or family history.</span>
     </div>     
   </div>
 
-  <div class="ui modal" id="aboutModal">
+  <div class="ui small modal" id="aboutModal">
     <div class="header">
       About
       <i class="close icon" onclick="closeModal()"></i>
@@ -147,6 +156,7 @@
   
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.js"></script>
+  <script src="js/data.js"></script>
   <script src="js/index.js"></script>
 </body>
 </html>
