@@ -1,127 +1,142 @@
 
-//Discussion categories (topics)
-const categories = {
-  greeting: {
-    importance: "Beginning the conversation with a greeting helps establish trust with the patient.",
-    covered: false,
-    defaultResponses: [
-      "Hello!",
-      "Hi there!",
-      "Hi, it's nice to meet you."
-    ]
-  },
+//Discussion categories (key discussion topics)
+  const categories = {
+    greeting: {
+      importance: "Beginning the conversation with a greeting helps establish trust with the patient.",
+      covered: false,
+      defaultResponses: [
+        "Hello!",
+        "Hi there!",
+        "Hi, it's nice to meet you."
+      ]
+    },
 
-  reason: {
-    covered: false,
-    importance: "Understanding the patient's reason for the visit provides a clear starting point and guides the focus of the conversation.",
-    defaultResponses: [
-      "Just a regular checkup; there's nothing specific going on.",
-      "I've been having some discomfort and thought I should get it checked out.",
-      "Work's been a little stressful, and I figured it's time to talk to someone about it."
-    ]
-  },
+    reason: {
+      covered: false,
+      importance: "Understanding the patient's reason for the visit provides a clear starting point and guides the focus of the conversation.",
+      defaultResponses: [
+        "Just a regular checkup; there's nothing specific going on.",
+        "I've been having some discomfort and thought I should get it checked out.",
+        "Work's been a little stressful, and I figured it's time to talk to someone about it."
+      ]
+    },
 
-  duration: {
-    covered: false,
-    importance: "Understanding how long an issue has been present helps determine its severity and guides diagnosis.",
-    defaultResponses: [
-      "It started a couple days ago.",
-      "I've been dealing with this for about a week now.",
-      "Honestly, it's been going on for a few days."
-    ]
-  },
+    duration: {
+      covered: false,
+      importance: "Understanding how long an issue has been present helps determine its severity and guides diagnosis.",
+      defaultResponses: [
+        "It started a couple days ago.",
+        "I've been dealing with this for about a week now.",
+        "Honestly, it's been going on for a few days."
+      ]
+    },
 
-  reproductive: {
-    covered: false,
-    importance: "Asking about menstrual cycles is key for understanding the patient's reproductive health and identifying irregularities.",
-    defaultResponses: [
-      "My last cycle was about a week ago, and everything's been normal.",
-      "My last cycle was a week ago&mdash;haven't noticed anything out of the ordinary."
-    ]
-  },
+    reproductive: {
+      covered: false,
+      importance: "Asking about menstrual cycles is key for understanding the patient's reproductive health and identifying irregularities for individuals assigned female at birth.",
+      defaultResponses: [
+        "My last cycle was about a week ago, and everything's been normal.",
+        "My last cycle was a week ago&mdash;haven't noticed anything out of the ordinary."
+      ]
+    },
 
-  medication: {
-    covered: false,
-    importance: "Discussing current medications is essential for understanding how the patient manages chronic conditions.",
-    defaultResponses: [
-      "I take them when I remember to, but I'm not perfect.",
-      "I've been trying to stay on top of my meds.",
-      "Sometimes I forget a dose, but usually I keep track."
-    ]
-  },
+    medication: {
+      covered: false,
+      importance: "Discussing current medications is essential for understanding how the patient manages chronic conditions.",
+      defaultResponses: [
+        "I take them when I remember to, but I'm not perfect.",
+        "I've been trying to stay on top of my meds.",
+        "Sometimes I forget a dose, but usually I keep track."
+      ]
+    },
 
-  lifestyle: {
-    covered: false,
-    importance: "Exploring the patient's daily routines, activity level, and habits provides insight into factors that may influence their health and recovery.",
-    defaultResponses: [
-      "It's been pretty normal&mdash;just the usual routine.",
-      "I try to stay active, but work keeps me busy.",
-      "I don't get a lot of downtime lately."
-    ]
-  },
+    lifestyle: {
+      covered: false,
+      importance: "Exploring the patient's daily routines, activity level, and habits provides insight into factors that may influence their health and recovery.",
+      defaultResponses: [
+        "It's been pretty normal&mdash;just the usual routine.",
+        "I try to stay active, but work keeps me busy.",
+        "I don't get a lot of downtime lately."
+      ]
+    },
 
-  sleep: {
-    covered: false,
-    importance: "Asking about sleep patterns can reveal issues that affect energy, mood, and overall health.",
-    defaultResponses: [
-      "I sleep okay most nights, but sometimes I wake up tired.",
-      "It takes me a while to fall asleep, especially if I've had a stressful day.",
-      "I try to get 7 to 8 hours, but it doesn't always happen."
-    ]
-  },
+    sleep: {
+      covered: false,
+      importance: "Asking about sleep patterns can reveal issues that affect energy, mood, and overall health.",
+      defaultResponses: [
+        "I sleep okay most nights, but sometimes I wake up tired.",
+        "It takes me a while to fall asleep, especially if I've had a stressful day.",
+        "I try to get 7 to 8 hours, but it doesn't always happen."
+      ]
+    },
 
-  diet: {
-    covered: false,
-    importance: "Asking about the patient's diet helps determine nutritional habits that may be affecting their symptoms or overall health.",
-    defaultResponses: [
-      "I try to eat healthy, but it's not perfect.",
-      "Mostly quick meals or takeout&mdash;depends on the day.",
-      "I've been skipping meals more than I should lately."
-    ]
-  },
+    diet: {
+      covered: false,
+      importance: "Asking about the patient's diet helps determine nutritional habits that may be affecting their symptoms or overall health.",
+      defaultResponses: [
+        "I try to eat healthy, but it's not perfect.",
+        "Mostly quick meals or takeout&mdash;depends on the day.",
+        "I've been skipping meals more than I should lately."
+      ]
+    },
 
-  pain: {
-    covered: false,
-    importance: "Identifying the presence, location, and nature of pain helps guide diagnosis and treatment decisions.",
-    defaultResponses: [
-      "Nothing serious&mdash;just some occasional aches.",
-      "I do get some discomfort now and then, especially after work.",
-      "Yeah, there's been some pain, but I've been managing."
-    ]
-  },
+    pain: {
+      covered: false,
+      importance: "Identifying the presence, location, and nature of pain helps guide diagnosis and treatment decisions.",
+      defaultResponses: [
+        "Nothing serious&mdash;just some occasional aches.",
+        "I do get some discomfort now and then, especially after work.",
+        "Yeah, there's been some pain, but I've been managing."
+      ]
+    },
 
-  stress: {
-    covered: false,
-    importance: "Assessing stress levels provides context for symptoms that may be rooted in emotional strain.",
-    defaultResponses: [
-      "It's been a little stressful lately, but I'm managing.",
-      "Some days are harder than others&mdash;I'm just trying to keep up.",
-      "Yeah, I've been feeling more anxious than usual."
-    ]
-  },
+    stress: {
+      covered: false,
+      importance: "Assessing stress levels provides context for symptoms that may be rooted in emotional strain.",
+      defaultResponses: [
+        "It's been a little stressful lately, but I'm managing.",
+        "Some days are harder than others&mdash;I'm just trying to keep up.",
+        "Yeah, I've been feeling more anxious than usual."
+      ]
+    },
 
-  substance: {
-    covered: false,
-    importance: "Inquiring about alcohol or drug use can reveal behaviors that may impact treatment effectiveness.",
-    defaultResponses: [
-      "I drink socially, nothing excessive.",
-      "I've cut back a bit recently&mdash;trying to be healthier.",
-      "It's not really something I think is a problem."
-    ]
-  },
+    substance: {
+      covered: false,
+      importance: "Inquiring about alcohol or drug use can reveal behaviors that may impact treatment effectiveness.",
+      defaultResponses: [
+        "I drink socially, nothing excessive.",
+        "I've cut back a bit recently&mdash;trying to be healthier.",
+        "It's not really something I think is a problem."
+      ]
+    },
 
-  closing: {
-    importance: "Concluding the visit respectfully helps build rapport.",
-    covered: false,
-    defaultResponses: [
-      "Take care!",
-      "Alright, goodbye.",
-      "Goodbye!"
-    ]
-  }
-};
-  
-  //Character traits (overrides some dialog)
+    insult: {
+      importance: "It's unprofessional to insult or speak disrespectfully to a patient. Doing so not only damages trust but also undermines your credibility as a healthcare provider.",
+      covered: false,
+      defaultResponses: [
+        "Well, that was uncalled for.",
+        "I don't appreciate your tone.",
+        "That was kind of rude, don't you think?",
+        "I'm just here to get help, not to be talked down to.",
+        "Is that how you usually talk to patients?",
+        "I'd rather we keep this respectful.",
+        "That was unnecessary.",
+        "I'm not sure why you're speaking to me like that."
+      ]
+    },
+
+    closing: {
+      importance: "Concluding the visit respectfully helps build rapport.",
+      covered: false,
+      defaultResponses: [
+        "Take care!",
+        "Alright, goodbye.",
+        "Goodbye!"
+      ]
+    }
+  };
+    
+  //Character traits (overrides scenario dialog)
   const characters = {
     tracy: {
       lifestyle: [
@@ -227,6 +242,10 @@ const categories = {
         "Figured I should get checked out... it's been a while since my last visit.",
         "Not sure, just figured I should check in and make sure everything's okay.",
         "Honestly? Just killing time, but might as well talk while I'm here."
+      ],
+      reproductive: [
+        "I think you must be confused.",
+        "That doesn't really apply to me."
       ]
     }
   };
@@ -538,6 +557,7 @@ const categories = {
       "Couldn't catch that, let's move on"  
   ];
   
+  //A list of hints which are context-aware of the current scenario
   const hintSuggestions = [
     { category: "lifestyle", hint: "Try asking about their daily routine or physical activity levels." },
     { category: "sleep", hint: "Ask how well they've been sleeping or if they feel rested." },
@@ -549,12 +569,20 @@ const categories = {
     { category: "reason", hint: "Start by asking what brought them in for today's visit." }
   ];
 
+  //Used for keyword recognition
   const keywords = {
     greeting: [
       "hello", "hi", "hey", "good morning", "good afternoon", "good evening",
       "greetings", "howdy", "how is it going", "how are you", 
       "pleasure", "nice to", "help you", "good to see you",
       "welcome", "hey there"
+    ],
+
+    insult: [
+      "dumb", "stupid", "idiot", "lazy", "incompetent", "useless",
+      "reckless", "moron", "careless", "fool", "ignorant", "pathetic",
+      "worthless", "irresponsible", "clueless", "annoying", "nuisance",
+      "crazy", "delusional", "brainless", "silly", "goofy"
     ],
 
     duration:[
@@ -626,6 +654,7 @@ const categories = {
     ]
   };
 
+  //Used to recognize certain keywords to 'trigger' an emotional response
   const emotionKeywords = {
     tracy: {
       sad: ["pain", "fatigue", "stomach", "nausea", "back", "sick", "unwell"],
@@ -637,13 +666,29 @@ const categories = {
       angry: ["work", "stress", "annoyed", "frustrated"],
       neutral: []
     },
-    checkup: {
-      sad: ["sick", "pain", "health", "struggling"],
-      angry: ["frustrated", "work", "stress"],
+    "tracy-checkup": {
+      sad: [],
+      angry: [],
       neutral: []
     }
   };
 
+  // Automatically inject insult keywords into the relevant emotion categories
+  ["tracy", "randy", "tracy-checkup"].forEach((characterKey) => {
+    if (!emotionKeywords[characterKey]) emotionKeywords[characterKey] = { sad: [], angry: [], neutral: [] };
+  
+    if (characterKey === "tracy" || characterKey === "tracy-checkup") {
+      emotionKeywords[characterKey].sad = [
+        ...new Set([...emotionKeywords[characterKey].sad, ...keywords.insult])
+      ];
+    } else if (characterKey === "randy") {
+      emotionKeywords[characterKey].angry = [
+        ...new Set([...emotionKeywords[characterKey].angry, ...keywords.insult])
+      ];
+    }
+  });
+
+  //Information about the patients
   const patientProfiles = {
     tracy: {
       name: "Tracy Ellis",
@@ -673,8 +718,10 @@ const categories = {
     }
   }; 
   
+  //Icons that appear in the summary screen
   const categoryIcons  = {
     greeting: "fa-handshake",
+    insult: "fa-face-angry",
     reproductive: "fa-calendar-check",
     duration: "fa-clock",
     lifestyle: "fa-person-walking",       

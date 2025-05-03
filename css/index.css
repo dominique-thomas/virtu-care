@@ -5,6 +5,7 @@ body {
     margin: 0;
     padding: 0;
     font-size: 15px !important;
+    overflow-y: auto;
   }
 
   a{
@@ -24,6 +25,14 @@ body {
   a:hover{
     color: #0a78f0;
     text-decoration: underline;
+  }
+
+  .centered-image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    height: auto;
   }
   
   .ui.container {
@@ -59,8 +68,18 @@ body {
   }
   
   .ui.modal {
-    border-radius: 12px !important;
+    height: auto;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    right: auto;
   }
+  @media (max-width: 768px) {
+    .ui.modal {     
+        width: 80%;
+        max-width: 80% !important;
+    }
+}
   
   h2.ui.header {
     padding-top: 20px;
@@ -321,6 +340,7 @@ body {
 
   #summary, #home{
     padding: 20px;
+    overflow-y: auto;
   }
 
   #summary li{
@@ -332,7 +352,6 @@ body {
     padding-bottom: 10px;
   }
 
-  /* Animations */
   @keyframes fadeIn {
     from {
       opacity: 0;

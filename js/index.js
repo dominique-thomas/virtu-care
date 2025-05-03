@@ -30,13 +30,12 @@ if (SpeechRecognition) {
   showPatientVideo("neutral");
   currentScenario = getRandomScenario(activePatient);
   generatePatientProfile();
-
+  $("#patientName").html(fullPatientName);
 } else {
   $("#speechWarning").removeClass("hidden");
 }
 
-$("#patientName").html(fullPatientName);
-
+//Set the patient's full name
 function setPatientFullName(){
   let fullName = "unknown";
   switch(activePatient){
@@ -50,80 +49,19 @@ function setPatientFullName(){
   return fullName;
 }
 
+//Show a random patient
+function getRandomCharacter() {
+  const characters = ["randy", "tracy"];
+  const randomIndex = Math.floor(Math.random() * characters.length);
+  return characters[randomIndex];
+}
+
+//Get a random scenario 
 function getRandomScenario(patient) {
   const patientScenarios = Object.keys(scenarios).filter(key => {
     return key.startsWith(patient) || !key.includes("-");
   });
   return randomFromArray(patientScenarios);
-}
-
-//Modal information
-$("#micModal").modal({
-  closable: false,
-  autofocus: false,
-  observeChanges: true,
-  onHide: resetTimer
-});
-
-//Reset timer for modal
-function resetTimer() {
-  timeLeft = 60;
-  
-  clearInterval(timerInterval); 
-  $("#timer").html(timeLeft);
-  
-  recognition.stop();
-  isListening = false;
- 
-  setTimeout(function(){  
-    renderPatientMessage(patientTranscript);
-    setTimeout(function() {
-      $("#chatArea").scrollTop($("#chatArea")[0].scrollHeight);
-    }, 100);
-  }, 800);
-}
- 
-
-//Stop listining to the user
-function stopListening() {
-  $("#micModal").modal("hide");
-}
-
-//Display the message in the div and in the chat log
-function renderUserMessage(message) {
-  const messageHtml = `
-    <div class="message-wrapper user">
-      <div class="message user">
-      ${message}
-      </div>
-    </div>
-  `;
-  $(".chat-log").append(messageHtml);
-}
-
-//Display the message in the div and in the chat log
-function renderPatientMessage(message) {
-
-  if(message == "")
-    return;
-  
-  // let tmpPatient = capitalizeFirst(activePatient);
-  // <strong>${tmpPatient}</strong><br>
-
-  const messageHtml = `
-    <div class="message-wrapper patient">
-      <div class="message patient">
-      ${message}
-      </div>
-    </div>
-  `;
-  $(".chat-log").append(messageHtml);
-}
-
-function getRandomCharacter() {
-  const characters = ["randy", "tracy"];
-  const randomIndex = Math.floor(Math.random() * characters.length);
-  return characters[randomIndex];
 }
 
 //Helper function that shows a particular video based on thier emotion (e.g., neutral, sad, angry)
@@ -133,9 +71,11 @@ function showPatientVideo(emotion) {
   const videoElement = $("#patientVideo")[0];
   const videoSource = $("#video-source");
 
+  //Don't do anything if the video same video is already playing or if the video is paused by the user
   if (currentEmotionVideo === emotion && !videoElement.paused) {
     return;
   }
+
   currentEmotionVideo = emotion;
 
   const videoName = `${activePatient}_${emotion}.mp4`;
@@ -154,7 +94,7 @@ function showPatientVideo(emotion) {
     // Only play the video if it's not paused
     videoElement.oncanplay = function() {
       if (!isVideoPaused) {
-        videoElement.play(); // play if not paused
+        videoElement.play();
       }
     };
   }, 100);
@@ -177,11 +117,72 @@ function toggleVideoPause() {
   }
 }
 
+//Modal information
+$("#micModal").modal({
+  closable: false,
+  autofocus: false,
+  observeChanges: true,
+  onHide: resetTimer
+});
+
+//Reset timer for the speech modal
+function resetTimer() {
+  timeLeft = 60;
+  
+  clearInterval(timerInterval); 
+  $("#timer").html(timeLeft);
+  
+  recognition.stop();
+  isListening = false;
+ 
+  setTimeout(function(){  
+    renderPatientMessage(patientTranscript);
+    setTimeout(function() {
+      $("#chatArea").scrollTop($("#chatArea")[0].scrollHeight);
+    }, 100);
+  }, 800);
+} 
+
+//Stop listining to the user's speech
+function stopListening() {
+  $("#micModal").modal("hide");
+}
+
+//Display the message in the div and in the chat log
+function renderUserMessage(message) {
+  const messageHtml = `
+    <div class="message-wrapper user">
+      <div class="message user">
+      ${message}
+      </div>
+    </div>
+  `;
+  $(".chat-log").append(messageHtml);
+}
+
+//Display the message in the div and in the chat log
+function renderPatientMessage(message) {
+
+  if(message == "")
+    return;
+
+  const messageHtml = `
+    <div class="message-wrapper patient">
+      <div class="message patient">
+      ${message}
+      </div>
+    </div>
+  `;
+  $(".chat-log").append(messageHtml);
+}
+
+//Change the video to show their 'trigger' keywords
 function showEmotionForResponse(response) {
 
   const characterEmotionKeywords = emotionKeywords[activePatient];
   const scenarioEmotionKeywords = emotionKeywords[currentScenario] || { sad: [], angry: [] };
 
+  //For specific characters
   for (let keyword of characterEmotionKeywords.sad) {
     if (response.includes(keyword)) {
       showPatientVideo("sad");
@@ -196,7 +197,7 @@ function showEmotionForResponse(response) {
     }
   }
 
-  // Check for general case scenario
+  // Check for scenarios
   for (let keyword of scenarioEmotionKeywords.sad) {
     if (response.includes(keyword)) {
       showPatientVideo("sad");
@@ -211,13 +212,8 @@ function showEmotionForResponse(response) {
     }
   }
 
+  //By default show neutral
   showPatientVideo("neutral");
-}
-
-
-//Helper function that capitalizes the first word of a string
-function capitalizeFirst(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 //Handles speech recognition
@@ -228,28 +224,27 @@ recognition.onresult = function(event) {
   let transcript = addPunctuation(tmpTranscript);
   const categoryKey = detectCategory(transcript);
 
+  //Display the user's speech
   renderUserMessage(transcript);
   $("#liveTranscript").html(transcript);
   showEmotionForResponse(transcript);
 
+  //Display the patient's response
   const response = getResponse(activePatient, categoryKey, currentScenario, transcript);
   patientTranscript = response;  
 };
 
-function randomFromArray(arr) {
-  const randomIndex = Math.floor(Math.random() * arr.length);
-  return arr[randomIndex];
-}
-
+//Helper function used to get the 
 function getResponse(character, categoryKey, scenarioKey) {
   const scenario = scenarios[scenarioKey];
   const category = categories[categoryKey];
 
+  console.log(categoryKey)
   if(categoryKey === null){
     return randomFromArray(characterFallbackResponses);
   }
 
-  if (category.covered) {
+  if (category.covered && categoryKey !== "insult") {
      return "We've already talked about that. Is there anything else you'd like to ask?";
   }
 
@@ -263,6 +258,7 @@ function getResponse(character, categoryKey, scenarioKey) {
     return randomFromArray(characters[character][categoryKey]);
   }
 
+  category.covered = true;
   return randomFromArray(category.defaultResponses);
 }
 
@@ -279,6 +275,7 @@ function detectCategory(input) {
   return null;
 }
 
+//Show a random hint
 function getRandomHint() {
   const closeModalStr = `<i class="close icon" onclick="closeModal()"></i>`;
   const scenario = scenarios[currentScenario];
@@ -307,6 +304,7 @@ function getRandomHint() {
   $("#hintText").html(randomHint.hint);
 }
 
+//Show the patient profile
 function generatePatientProfile(){
 
   const profile = patientProfiles[activePatient];
@@ -320,6 +318,7 @@ function generatePatientProfile(){
   $("#profileDetails").html(profileHTML);
 }
 
+//Generate the summary
 function generateSummary() {
   const scenario = scenarios[currentScenario];  
   const requiredCategories = scenario.requiredCategories || []; 
@@ -387,6 +386,17 @@ function addPunctuation(response) {
   return response + ".";
 }
 
+//Helper function used to get a random element from the array
+function randomFromArray(arr) {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
+
+//Helper function that capitalizes the first word of a string
+function capitalizeFirst(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 //-----------------------------------------
 // Testing and Debugging
 //-----------------------------------------
@@ -401,8 +411,8 @@ function runAudit(character, scenarioKey) {
     const question = getCategoryQuestion(categoryKey);
     
     let response = scenario[categoryKey]?.override
-      ? scenario[categoryKey].responses.join(" / ")
-      : character[categoryKey]?.[0] || "No response provided";
+    ? scenario[categoryKey].responses.join(" / ")
+    : character[categoryKey]?.[0] || category.defaultResponses?.[0] || "No response provided";  
 
     console.log(`Q: ${question}\nA: ${response}\n`);
 
@@ -416,7 +426,9 @@ function runAudit(character, scenarioKey) {
 function getCategoryQuestion(category) {
   const questions = {
     greeting: "Good afternoon.",
-    reason: "Why are we seeing you for today?",
+    reason: "What are we seeing you for today?",
+    reproductive: "Is your cycle normal?",
+    duration: "How long has this issue occured?", 
     lifestyle: "Can you tell me about your daily activities?",
     sleep: "How has your sleep been lately?",
     diet: "What is your diet like?",
@@ -424,6 +436,7 @@ function getCategoryQuestion(category) {
     stress: "How are you managing your stress levels?",
     medication: "Are you on any medications?",
     substance: "Do you use any substances like alcohol or caffeine?",
+    insult: "Are you stupid?",
     closing: "Goodbye."
   };
 
@@ -467,6 +480,10 @@ function showHint(){
 
 function showPatientProfile(){
   $("#profileModal").modal("show");
+}
+
+function showMicPrompt(){
+  $("#micAccessModal").modal("show");
 }
 
 function showSummary(){

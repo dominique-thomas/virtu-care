@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VirtuCare</title>
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css">
@@ -24,9 +27,10 @@
         <!-- Scenario intro section -->
         <h2 class="ui header center">Welcome to VirtuCare</h2>
         <p>VirtuCare is a simulation designed to help healthcare professionals practice patient interviews in a realistic, low-pressure environment.
-            You'll be introduced to one of two virtual patients. The patients, thier symptoms, their and responses may vary per session.
+            In the simulation, you'll be introduced to one of two virtual patients. The patients, thier symptoms, their and responses may vary each session.
             <br><br>
-            Before continuing, you'll need to allow microphone access to speak to the patient. Make sure to ask questions and gather information, just like you're in a real-world setting.
+            To speak with the patient, you'll need to grant the site access to your microphone.
+            If prompted, be sure to grant access. You'll only need to do this once. <a href="#" onclick="showMicPrompt()">Click here to see an example.</a>
             <br><br>
             Click the button below to begin your session.</p>
             
@@ -40,14 +44,17 @@
           <h2 class="ui header center">Patient Interview</h2>        
           <div class="ui container segment">            
             <div class="ui secondary menu patient-header-bar container">
-                <div class="item">
+                <div class="item hidden">
                     <span class="patientHeader">Patient Name: </span><span id="patientName">Tracy</span>
                 </div>
+
+                <div class="item links" onclick="showPatientProfile()">
+                  <i class="id badge circle icon link"></i>
+                  Patient Profile
+                </div>
+
                 <div class="right menu">
-                  <div class="item links" onclick="showPatientProfile()">
-                    <i class="id badge circle icon link"></i>
-                    Patient Profile
-                  </div>
+                 
        
                   <div class="item links" onclick="showAbout()">
                     <i class="info circle icon link"></i>
@@ -107,13 +114,22 @@
 
       <h3>Topics You Didn't Discuss</h3>
       <ul id="missedList"></ul>
-    <br><br>
     <p class="restartMessage">To restart the simulation, please refresh the page.</p>
 
   </div>
 
 
-  <!-- Modals -->    
+  <!-- Modals -->  
+  <div class="ui modal small" id="micAccessModal">
+    <div class="header">
+      Microphone Access Prompt
+      <i class="close icon" onclick="closeModal()"></i>
+    </div>
+    <div class="content">
+      <img src="images/microphone_prompt.png" class="centered-image" alt="Mic Access Prompt">
+    </div>   
+  </div>
+
   <div class="ui small modal mic-modal" id="micModal">
     <div class="header">
       <i class="microphone icon pulse-icon"></i>
@@ -172,7 +188,7 @@
     </div>
      
     <div class="content">
-      <p>VirtuCare is designed to help medical students practice patient interviewing skills. Each session presents unique virtual patients and scenarios, encouraging clinical reasoning and conversation.
+      <p>VirtuCare is designed to help medical professionals practice patient interviewing skills. Each session presents unique virtual patients and scenarios, encouraging clinical reasoning and conversation.
       This project is free to use and provided as-is for educational purposes.
       <br><br>
       The simulation and associated videos were created and developed by <a href="https://www.linkedin.com/in/dominique-thomas-ab56b433/" target="_blank">Dominique Thomas</a>.<br>All character animations were rendered using Unreal Engine's <a href="https://metahuman.unrealengine.com/" target="_blank">MetaHuman</a> framework.</p>
