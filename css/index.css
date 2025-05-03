@@ -338,6 +338,11 @@ body {
     -webkit-text-fill-color: transparent;
   }
 
+  #summary{
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
   #summary, #home{
     padding: 20px;
     overflow-y: auto;
