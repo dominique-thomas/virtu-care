@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VirtuCare</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css">
   <link rel="stylesheet" href="css/index.css">
@@ -28,6 +29,7 @@
             Before continuing, you'll need to allow microphone access to speak to the patient. Make sure to ask questions and gather information, just like you're in a real-world setting.
             <br><br>
             Click the button below to begin your session.</p>
+            
       <div> <button class="ui gradient-button start-btn" onclick="startInterview()">Start Interview</button>
         </div>
       </div>
@@ -42,8 +44,15 @@
                     <span class="patientHeader">Patient Name: </span><span id="patientName">Tracy</span>
                 </div>
                 <div class="right menu">
-                  <div class="item">
-                    <i class="question circle icon link" onclick="showAbout()"></i>
+                  <div class="item links" onclick="showPatientProfile()">
+                    <i class="id badge circle icon link"></i>
+                    Patient Profile
+                  </div>
+       
+                  <div class="item links" onclick="showAbout()">
+                    <i class="info circle icon link"></i>
+                    About
+                    </a>
                   </div>
                 </div>
               </div>
@@ -56,7 +65,7 @@
                   Your browser does not support the video tag.
                 </video>
 
-                <button id="videoToggle" class="ui icon button play-pause-btn">
+                <button id="videoToggle" class="ui icon play-pause-btn gradient-button" onclick="toggleVideoPause()">
                   <i class="pause icon"></i>
                 </button>
 
@@ -87,19 +96,24 @@
   
   <div id="summary" class="ui container hidden">
     <h2 class="ui header center">Interview Summary</h2>
-     <p>Here's a summary of your conversation with the patient:</p>
+     <p>Here's a summary of the interview session.
+      Take a moment to reflect on the topics you discussed and consider any key areas that may have been missed. This reflection can help strengthen your clinical interviewing skills for future sessions.</p>
 
-      <h3>What You Discussed</h3>
-      <ul id="covered-list"></ul>
+      <h3>Reason for Patient Visit</h3>
+      <ul id="reasonForVisitList"></ul>
 
-      <h3>What You Didn't Discuss</h3>
-      <ul id="missed-list"></ul>
-    <button class="ui button" onclick="reset()">Reset Simulation</button>
+      <h3>Topics You Discussed</h3>
+      <ul id="coveredList"></ul>
+
+      <h3>Topics You Didn't Discuss</h3>
+      <ul id="missedList"></ul>
+    <br><br>
+    <p class="restartMessage">To restart the simulation, please refresh the page.</p>
+
   </div>
 
 
-  <!-- Modals --> 
-   
+  <!-- Modals -->    
   <div class="ui small modal mic-modal" id="micModal">
     <div class="header">
       <i class="microphone icon pulse-icon"></i>
@@ -107,7 +121,7 @@
     </div>
     <div class="content">
      For best results, ask one question at a time.<br>
-      This modal will stop listening after <span id="timer" class="timer">60s</span> seconds or when you click the <span>Stop Listening</span>button below.
+      The app will stop listening after <span id="timer" class="timer">60</span> seconds or when you click the <span>Stop Listening</span> button below.
        <br> <br> 
       <p>You said:</p>
       <div id="liveTranscript" class="stylized"></div>
@@ -131,6 +145,17 @@
     </div> 
   </div>
 
+  <div class="ui modal mini" id="profileModal">
+    <div class="header">
+      Patient Profile
+      <i class="close icon" onclick="closeModal()"></i>
+    </div>
+    <div class="content">
+      <div class="ui list" id="profileDetails">
+      </div>
+    </div>
+  </div>
+
   <div class="ui small modal" id="hintModal">
     <div class="hint header">
       Hint (1 of 3)      
@@ -147,7 +172,7 @@
     </div>
      
     <div class="content">
-      <p>VirtuCare is designed to help students practice patient interviewing skills in a realistic, low-risk environment. Each session presents unique virtual patients and scenarios, encouraging clinical reasoning and natural conversation.
+      <p>VirtuCare is designed to help medical students practice patient interviewing skills. Each session presents unique virtual patients and scenarios, encouraging clinical reasoning and conversation.
       This project is free to use and provided as-is for educational purposes.
       <br><br>
       The simulation and associated videos were created and developed by <a href="https://www.linkedin.com/in/dominique-thomas-ab56b433/" target="_blank">Dominique Thomas</a>.<br>All character animations were rendered using Unreal Engine's <a href="https://metahuman.unrealengine.com/" target="_blank">MetaHuman</a> framework.</p>

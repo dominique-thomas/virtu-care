@@ -10,11 +10,10 @@ let currentScenario = "";
 let fullPatientName = setPatientFullName();
 let patientTranscript = "";
 let shownHintCategories = [];
-const maxHints = 3;
+let isVideoPaused = false;
 let hintCounter = 0;
-const video = document.getElementById("patientVideo");
-const toggleBtn = document.getElementById("videoToggle");
-const icon = toggleBtn.querySelector("i");
+let currentEmotionVideo = null;
+const maxHints = 2;
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 //-----------------------------------------
@@ -30,6 +29,7 @@ if (SpeechRecognition) {
   $("#main").removeClass("hidden");
   showPatientVideo("neutral");
   currentScenario = getRandomScenario(activePatient);
+  generatePatientProfile();
 
 } else {
   $("#speechWarning").removeClass("hidden");
@@ -70,7 +70,7 @@ function resetTimer() {
   timeLeft = 60;
   
   clearInterval(timerInterval); 
-  $("#timer").html(timeLeft + "s");
+  $("#timer").html(timeLeft);
   
   recognition.stop();
   isListening = false;
@@ -82,19 +82,7 @@ function resetTimer() {
     }, 100);
   }, 800);
 }
-
-//Toggle button play/pause functionality
-toggleBtn.addEventListener("click", () => {
-  if (video.paused) {
-    video.play();
-    icon.classList.remove("play");
-    icon.classList.add("pause");
-  } else {
-    video.pause();
-    icon.classList.remove("pause");
-    icon.classList.add("play");
-  }
-});
+ 
 
 //Stop listining to the user
 function stopListening() {
@@ -106,7 +94,6 @@ function renderUserMessage(message) {
   const messageHtml = `
     <div class="message-wrapper user">
       <div class="message user">
-      <strong>You</strong><br>
       ${message}
       </div>
     </div>
@@ -120,11 +107,12 @@ function renderPatientMessage(message) {
   if(message == "")
     return;
   
-  let tmpPatient = capitalizeFirst(activePatient);
+  // let tmpPatient = capitalizeFirst(activePatient);
+  // <strong>${tmpPatient}</strong><br>
+
   const messageHtml = `
     <div class="message-wrapper patient">
       <div class="message patient">
-      <strong>${tmpPatient}</strong><br>
       ${message}
       </div>
     </div>
@@ -145,6 +133,11 @@ function showPatientVideo(emotion) {
   const videoElement = $("#patientVideo")[0];
   const videoSource = $("#video-source");
 
+  if (currentEmotionVideo === emotion && !videoElement.paused) {
+    return;
+  }
+  currentEmotionVideo = emotion;
+
   const videoName = `${activePatient}_${emotion}.mp4`;
   videoSource.attr("src", `videos/${videoName}`);
 
@@ -157,11 +150,70 @@ function showPatientVideo(emotion) {
   setTimeout(function() {
     overlay.css("opacity", 0);
     videoElement.classList.add("videoFadeIn");
+    
+    // Only play the video if it's not paused
     videoElement.oncanplay = function() {
-      videoElement.play();
+      if (!isVideoPaused) {
+        videoElement.play(); // play if not paused
+      }
     };
   }, 100);
 }
+
+// Function to handle pausing
+function toggleVideoPause() {
+
+  const icon = $("#videoToggle i");
+  const videoElement = $("#patientVideo")[0];
+  
+  if (videoElement.paused) {
+    isVideoPaused = false;
+    videoElement.play();
+    icon.removeClass("play").addClass("pause");
+  } else {
+    isVideoPaused = true;
+    videoElement.pause();
+    icon.removeClass("pause").addClass("play");
+  }
+}
+
+function showEmotionForResponse(response) {
+
+  const characterEmotionKeywords = emotionKeywords[activePatient];
+  const scenarioEmotionKeywords = emotionKeywords[currentScenario] || { sad: [], angry: [] };
+
+  for (let keyword of characterEmotionKeywords.sad) {
+    if (response.includes(keyword)) {
+      showPatientVideo("sad");
+      return;
+    }
+  }
+
+  for (let keyword of characterEmotionKeywords.angry) {
+    if (response.includes(keyword)) {
+      showPatientVideo("angry");
+      return;
+    }
+  }
+
+  // Check for general case scenario
+  for (let keyword of scenarioEmotionKeywords.sad) {
+    if (response.includes(keyword)) {
+      showPatientVideo("sad");
+      return;
+    }
+  }
+
+  for (let keyword of scenarioEmotionKeywords.angry) {
+    if (response.includes(keyword)) {
+      showPatientVideo("angry");
+      return;
+    }
+  }
+
+  showPatientVideo("neutral");
+}
+
 
 //Helper function that capitalizes the first word of a string
 function capitalizeFirst(str) {
@@ -172,11 +224,13 @@ function capitalizeFirst(str) {
 recognition.onresult = function(event) {
   $(".chatPrompt").addClass("hidden");
 
-  let transcript = capitalizeFirst(event.results[0][0].transcript);
+  let tmpTranscript = capitalizeFirst(event.results[0][0].transcript);
+  let transcript = addPunctuation(tmpTranscript);
   const categoryKey = detectCategory(transcript);
 
   renderUserMessage(transcript);
   $("#liveTranscript").html(transcript);
+  showEmotionForResponse(transcript);
 
   const response = getResponse(activePatient, categoryKey, currentScenario, transcript);
   patientTranscript = response;  
@@ -187,11 +241,10 @@ function randomFromArray(arr) {
   return arr[randomIndex];
 }
 
-function getResponse(character, categoryKey, scenarioKey, userInput) {
+function getResponse(character, categoryKey, scenarioKey) {
   const scenario = scenarios[scenarioKey];
   const category = categories[categoryKey];
 
-  console.log(categoryKey)
   if(categoryKey === null){
     return randomFromArray(characterFallbackResponses);
   }
@@ -214,69 +267,8 @@ function getResponse(character, categoryKey, scenarioKey, userInput) {
 }
 
 function detectCategory(input) {
-  const keywords = {
-    greeting: [
-      "hello", "hi", "hey", "good morning", "good afternoon", "good evening",
-      "greetings", "howdy", "how is it going", "how are you", 
-      "pleasure", "nice to", "help you", "good to see you",
-      "welcome", "hey there"
-    ],
-  
-    lifestyle: [
-      "lifestyle", "routine", "daily", "activity", "habits", "exercise", "workout", "physical activity",
-      "fitness", "schedule", "work life", "daily routine", "stress levels", "routine maintenance",
-      "balance", "hobbies", "well-being", "routine changes"
-    ],
-  
-    sleep: [
-      "sleep", "insomnia", "tired", "rest", "fatigue", "bedtime", "sleep quality", "sleep pattern",
-      "trouble sleeping", "waking up", "night sleep", "restful sleep", "rested", "naps", "sleeping habits",
-      "snoring", "dreams", "deep sleep", "poor sleep", "circadian rhythm"
-    ],
-  
-    diet: [
-      "diet", "food", "eating", "eat", "appetite", "nutrition", "meals", "snacks", "calories", 
-      "healthy eating", "meal plan", "balanced diet", "junk food", "vegetables", "fruit", "fast food",
-      "sugar", "processed food", "eating habits", "meal timing", "drinks", "sweets", "carbs", "protein",
-      "dietary preferences", "diet changes", "nutrition plan"
-    ],
-  
-    pain: [
-      "pain", "ache", "hurt", "sore", "discomfort", "stiffness", "pressure", "pain level", "muscle pain",
-      "joint pain", "headache", "back pain", "neck pain", "throbbing", "sharp pain", "chronic pain", 
-      "nagging pain", "cramps", "tenderness", "body aches", "pain management", "pain relief", "pain medication"
-    ],
-  
-    stress: [
-      "stress", "anxiety", "worried", "overwhelmed", "pressure", "mental", "worry", "mood", "nervous",
-      "stressed out", "panic", "tension", "burnout", "feeling tense", "unsettled", "nervousness", "mental health",
-      "emotional strain", "frustration", "feeling anxious", "stress management", "feeling overwhelmed", 
-      "emotional pressure", "restlessness", "work stress", "life stress", "personal stress"
-    ],
-  
-    medication: [
-      "medication", "pills", "prescription", "taking", "medicine", "drugs", "treatment", "pharmacy", 
-      "prescribed", "dosage", "medicine regimen", "doctor's orders", "health supplements", "antidepressants",
-      "painkillers", "antibiotics", "heart medication", "blood pressure meds", "sleep aids", "inhaler", 
-      "insulin", "meds", "prescriptions"
-    ],
-  
-    substance: [
-      "alcohol", "drinking", "smoking", "drugs", "substance", "substance abuse", "alcoholism", "drunken", 
-      "beer", "wine", "cocktails", "liquor", "cigarettes", "tobacco", "vape", "addiction", "substance use",
-      "dependency", "recovery", "drug use", "marijuana", "weed", "pills", "overuse", "alcohol consumption",
-      "drug abuse"
-    ],
-  
-    goodbyes: [
-      "bye", "goodbye", "take care", "see you later", "have a good day", "good evening", "good night", 
-      "see you soon", "farewell", "until next time", "catch you later", "later", "adios",
-      "so long", "take it easy", "talk soon", "goodbye for now", "until we meet again", "ciao", "have a good one"
-    ]
-  };
 
   input = input.trim().toLowerCase().replace(/[^\w\s]/g, "");
-
    
   for (const category in keywords) {
     if (keywords[category].some(word => input.includes(word))) {
@@ -289,13 +281,20 @@ function detectCategory(input) {
 
 function getRandomHint() {
   const closeModalStr = `<i class="close icon" onclick="closeModal()"></i>`;
-  const uncoveredHints = hintSuggestions.filter(
-    h => !categories[h.category].covered && !shownHintCategories.includes(h.category)
-  );
+  const scenario = scenarios[currentScenario];
+  const required = scenario.requiredCategories || [];
+
+  const uncoveredHints = hintSuggestions.filter(h => {
+    return (
+      required.includes(h.category) &&
+      !categories[h.category].covered &&
+      !shownHintCategories.includes(h.category)
+    );
+  });
 
   if (uncoveredHints.length === 0 || hintCounter >= maxHints) {
     $(".hint.header").html("Hints" + closeModalStr);
-    $("#hintText").html("Sorry, you've already seen all the available hints!");
+    $("#hintText").html("Sorry, you've already seen all the available hints for this interview session!");
     return;
   }
 
@@ -308,24 +307,59 @@ function getRandomHint() {
   $("#hintText").html(randomHint.hint);
 }
 
+function generatePatientProfile(){
+
+  const profile = patientProfiles[activePatient];
+  let profileHTML = "";
+
+  for (const [key, value] of Object.entries(profile)) {
+    const label = capitalizeFirst(key.replace(/([A-Z])/g, ' $1'));
+    profileHTML += `<div class="item"><span class="emphasis">${label}:</span> ${value}</div>`;
+  }
+
+  $("#profileDetails").html(profileHTML);
+}
+
 function generateSummary() {
+  const scenario = scenarios[currentScenario];  
+  const requiredCategories = scenario.requiredCategories || []; 
+  const keyConcerns = scenario.keyConcerns
+    ? `<li>${scenario.keyConcerns}</li>`
+    : "<li>The patient came in for a routine annual checkup.</li>";
+  
+  const fullRequired = ["greeting", ...requiredCategories, "closing"];
+
   const coveredCategories = [];
   const missedCategories = [];
 
-  for (const key in categories) {
-    //if (key === "greeting" || key === "goodbyes") continue;
-
+  // Loop through all categories and list ones that were covered
+  Object.keys(categories).forEach(key => {
     const category = categories[key];
-    const listItem = `<li><strong>${capitalizeFirst(key)}:</strong> ${category.importance || 'No description available.'}</li>`;
-
     if (category.covered) {
+      const iconClass = categoryIcons[key] || "fa-circle";
+      const listItem = `
+        <li>
+          <i class="emphasis fas ${iconClass}" style="margin-right: 8px;"></i>
+          <span class="emphasis">${capitalizeFirst(key)}:</span> ${category.importance || 'No description available.'}
+        </li>`;
       coveredCategories.push(listItem);
-    } else {
-      missedCategories.push(listItem);
     }
-  }
+  });
 
-  // Add default if nothing was covered/missed
+  // Loop through required categories and find ones that were missed
+  fullRequired.forEach(key => {
+    const category = categories[key];
+    if (!category || category.covered) return;
+
+    const iconClass = categoryIcons[key] || "fa-circle";
+    const listItem = `
+      <li>
+        <i class="emphasis fas ${iconClass}" style="margin-right: 8px;"></i>
+        <span class="emphasis">${capitalizeFirst(key)}:</span> ${category.importance || 'No description available.'}
+      </li>`;
+    missedCategories.push(listItem);
+  });
+
   if (coveredCategories.length === 0) {
     coveredCategories.push("<li>N/A</li>");
   }
@@ -334,8 +368,66 @@ function generateSummary() {
     missedCategories.push("<li>N/A</li>");
   }
 
-  $("#covered-list").html(coveredCategories.join(""));
-  $("#missed-list").html(missedCategories.join(""));
+  $("#reasonForVisitList").html(keyConcerns);
+  $("#coveredList").html(coveredCategories.join(""));
+  $("#missedList").html(missedCategories.join(""));
+}
+  
+//Check to see if the user asked a question or made a statement
+function addPunctuation(response) {
+  const questionWords = ["who", "what", "when", "where", "how", "why", "is", "are", "can", "do", "does"];
+  response = response.trim();
+
+  const firstWord = response.split(' ')[0].toLowerCase();
+
+  if (questionWords.includes(firstWord)) {
+    return response + "?";
+  }
+
+  return response + ".";
+}
+
+//-----------------------------------------
+// Testing and Debugging
+//-----------------------------------------
+function runAudit(character, scenarioKey) {
+  const scenario = scenarios[scenarioKey];
+  
+  console.log(`Key Concerns: ${scenario.keyConcerns || "No key concerns provided"}`);
+
+  for (const categoryKey in categories) {
+    const category = categories[categoryKey];
+
+    const question = getCategoryQuestion(categoryKey);
+    
+    let response = scenario[categoryKey]?.override
+      ? scenario[categoryKey].responses.join(" / ")
+      : character[categoryKey]?.[0] || "No response provided";
+
+    console.log(`Q: ${question}\nA: ${response}\n`);
+
+    if (!response || response === "No response provided") {
+      console.log(`${categoryKey} is missing!`);
+    }
+  }
+}
+
+
+function getCategoryQuestion(category) {
+  const questions = {
+    greeting: "Good afternoon.",
+    reason: "Why are we seeing you for today?",
+    lifestyle: "Can you tell me about your daily activities?",
+    sleep: "How has your sleep been lately?",
+    diet: "What is your diet like?",
+    pain: "Are you experiencing any pain?",
+    stress: "How are you managing your stress levels?",
+    medication: "Are you on any medications?",
+    substance: "Do you use any substances like alcohol or caffeine?",
+    closing: "Goodbye."
+  };
+
+  return questions[category] || "No question defined for this category.";
 }
 
 //-----------------------------------------
@@ -354,7 +446,7 @@ function askPatient(){
       clearInterval(timerInterval);
       stopListening();
     } else {
-      $("#timer").html(timeLeft + "s");
+      $("#timer").html(timeLeft);
       timeLeft--;
     }
   }, 1000);
@@ -371,6 +463,10 @@ function showFinish(){
 function showHint(){
   $("#hintModal").modal("show");
   getRandomHint();
+}
+
+function showPatientProfile(){
+  $("#profileModal").modal("show");
 }
 
 function showSummary(){

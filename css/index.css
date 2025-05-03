@@ -12,6 +12,10 @@ body {
     text-decoration: underline;
   }
 
+  .item.links{
+    cursor:pointer;
+  }
+
   h4{
    text-align: center;
    font-size: 18px;
@@ -63,14 +67,14 @@ body {
     padding-bottom: 10px;
     margin-bottom: 0.5rem;
     font-size: 2.3em !important;
-    background: linear-gradient(to right, #4e9af1, #0a78f0);
+    background: linear-gradient(to right, #4769ff, #0a78f0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-align: center;
   }
 
   .gradient-button {
-    background: linear-gradient(to right, #4e9af1, #0a78f0);
+    background: linear-gradient(to right, #4769ff, #0a78f0);
     background-size: 200% 100%;
     background-position: right bottom;
     color: #f4f4f4 !important;
@@ -87,8 +91,9 @@ body {
     background-position: left bottom;
   }
   
-  .question.circle{
+  .icon.link{
     font-size: 1.5rem;
+    color: #0a78f0;
   }
 
   .emphasis{
@@ -164,21 +169,14 @@ body {
     position: absolute;
     bottom: 10px;
     left: 5px;
-    background-color: #0a78f0 !important;
     color: white !important;
-    padding: 8px 10px;
+    padding-left: 12px;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    opacity: 0.85;
-    z-index: 2;
+     z-index: 2;
   }
   
   .play-pause-btn i.icon {
     color: white !important;
-  }
-  
-  .play-pause-btn:hover {
-    opacity: 1;
   }
 
   .patientHeader {
@@ -286,13 +284,6 @@ body {
     color: rgba(0, 0, 0, 0.5) !important; 
   }
 
-  .hints{
-    font-weight: bold;
-    text-align: center;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
   .timer {
     font-weight: bold;
     color: #0a78f0;
@@ -315,6 +306,30 @@ body {
     text-align: center;
     padding: 20px;
     color: #777;
+  }
+
+  .restartMessage{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    background: linear-gradient(to right, #4769ff, #11abff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  #summary, #home{
+    padding: 20px;
+  }
+
+  #summary li{
+    list-style: none;
+    margin-left: -40px !important;
+  }
+
+  li{
+    padding-bottom: 10px;
   }
 
   /* Animations */
