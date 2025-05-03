@@ -5,7 +5,6 @@ body {
     margin: 0;
     padding: 0;
     font-size: 15px !important;
-    overflow-y: auto;
   }
 
   a{
@@ -341,11 +340,11 @@ body {
   #summary{
     max-height: 90vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   #summary, #home{
     padding: 20px;
-    overflow-y: auto;
   }
 
   #summary li{

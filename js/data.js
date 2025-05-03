@@ -411,9 +411,16 @@
         override: true,
         responses: [
           "The headaches have been on and off for a few weeks.",
-          "This has been building up for a while now. I think it's been a little over a month."
+          "This has been building up for a while now. I think it's been a little over a few weeks."
         ]
-      }
+      },
+      reason: {
+        override: true,
+        responses: [
+          "I've been having some bad headaches and thought I should see someone about it.",
+          "My head has been pounding lately."
+        ]
+      },
     },
   
     "randy-substance": {
