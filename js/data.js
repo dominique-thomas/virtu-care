@@ -1,4 +1,9 @@
-
+/**
+ * Project: VirtuCare
+ * Description: Contains virtual patient data including dialog options and symptoms.
+ * Author: Dominique Thomas (github.com/dominique-thomas)
+ * License: Shared publicly for demonstration purposes only. Reuse or redistribution not permitted without permission.
+ */
 //Discussion categories (key discussion topics)
   const categories = {
     greeting: {
