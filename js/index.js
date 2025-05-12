@@ -1,3 +1,9 @@
+/**
+ * Project: VirtuCare
+ * Description: Handles core logic for voice recognition, session flow, patient responses, and summary feedback generation.
+ * Author: Dominique Thomas (github.com/dominique-thomas)
+ * License: Shared publicly for demonstration purposes only. Reuse or redistribution not permitted without permission.
+ */
 //-----------------------------------------
 // Global Variables
 //-----------------------------------------
