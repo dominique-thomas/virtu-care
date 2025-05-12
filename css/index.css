@@ -1,3 +1,9 @@
+/*
+  Project: VirtuCare
+  Description: Stylesheet for layout, virtual patient interface, and feedback summary display.
+  Author: Dominique Thomas (github.com/dominique-thomas)
+  License: Shared publicly for demonstration purposes only. Reuse or redistribution not permitted without permission.
+*/
 body {
     background-color: #f5f7fa;
     font-family: "Roboto", sans-serif;
